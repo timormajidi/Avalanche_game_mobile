@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checklist Avalanchas - Móvil</title>
+<style>
+body { font-family: Arial; background:#f2f4f7; padding:20px; margin:0; }
+.card { background:white; padding:20px; border-radius:10px; max-width:600px; margin:auto; box-shadow:0 4px 10px rgba(0,0,0,0.1); }
+h2 { margin-top:0; font-size:1.5em; text-align:center; }
+button { padding:15px; margin:10px 0; border:none; border-radius:8px; cursor:pointer; font-size:1.1em; width:100%; }
+.yes { background:#2e7d32; color:white; }
+.no { background:#c62828; color:white; }
+.result { margin-top:20px; font-weight:bold; font-size:1.2em; text-align:center; }
+.summary { margin-top:20px; background:#eef3f7; padding:15px; border-radius:8px; font-size:0.95em; }
+.info { font-size:0.9em; margin-top:10px; background:#f7f7f7; padding:10px; border-radius:6px; }
+</style>
+</head>
+<body>
+
+<div class="card">
+<h2>Checklist Avalanchas</h2>
+
+<div id="question"></div>
+<div id="info" class="info"></div>
+<div id="buttons"></div>
+<div id="result" class="result"></div>
+<div id="summary" class="summary"></div>
+
+</div>
+
+<script>
+let step = 0;
+let risk = 0;
+let answers = [];
+
+const steps = [
+{q:"¿Has consultado el BPA correcto y vigente para tu zona?", info:"IGCC, AEMET u otra fuente oficial.", yes:{next:1, risk:0}, no:{end:"No salir hasta consultar BPA."}},
+{q:"¿Comprendes problema principal, orientaciones y cota crítica?", info:"Necesitas interpretar el boletín para tu itinerario y hora de paso.", yes:{next:2, risk:0}, no:{end:"Revisa BPA antes de salir."}},
+{q:"¿El itinerario pasa por pendientes ≥30º?", info:"Las pendientes ≥30º tienen mayor probabilidad de avalanchas.", yes:{next:3, risk:2}, no:{next:3, risk:0}},
+{q:"¿Coincide orientación del itinerario con orientación crítica del BPA?", info:"Si coincide, el riesgo aumenta.", yes:{next:4, risk:2}, no:{next:4, risk:0}},
+{q:"¿La altitud máxima del itinerario entra en franja crítica del BPA?", info:"Altitud y hora de paso son importantes.", yes:{next:5, risk:2}, no:{next:5, risk:0}},
+{q:"¿Existen convexidades, canales, barrancos u otros terrenos trampa?", info:"Aumentan consecuencia de un alud.", yes:{next:6, risk:3}, no:{next:6, risk:0}},
+{q:"¿Ha caído nieve nueva en últimas 12h o se prevé durante la salida?", info:"Nieve reciente aumenta sobrecarga sobre capas débiles.", yes:{next:7, risk:2}, no:{next:7, risk:0}},
+{q:"¿Hay viento fuerte que pueda transportar nieve?", info:"El viento genera placas en sotavento.", yes:{next:8, risk:2}, no:{next:8, risk:0}},
+{q:"¿La visibilidad permite evaluar correctamente el terreno?", info:"Mala visibilidad dificulta detección de señales de riesgo.", yes:{next:9, risk:0}, no:{next:9, risk:1}},
+{q:"¿Tienes Plan B o escapatorias para reducir exposición?", info:"Alternativas seguras reducen riesgo durante la salida.", yes:{end:"evaluate"}, no:{end:"Define Plan B antes de salir."}}
+];
+
+function showStep(s){
+    const stepObj = steps[s];
+    document.getElementById("question").textContent = stepObj.q;
+    document.getElementById("info").textContent = stepObj.info;
+    const btnDiv = document.getElementById("buttons");
+    btnDiv.innerHTML = "";
+    createButton("Sí","yes",()=>handle(stepObj.q,"Sí",stepObj.yes));
+    createButton("No","no",()=>handle(stepObj.q,"No",stepObj.no));
+}
+
+function createButton(txt,cls,fn){
+    const btn = document.createElement("button");
+    btn.textContent = txt;
+    btn.className = cls;
+    btn.onclick = fn;
+    document.getElementById("buttons").appendChild(btn);
+}
+
+function handle(q,res,act){
+    answers.push({question:q,response:res});
+    if(act.risk) risk += act.risk;
+    if(act.next !== undefined){ showStep(act.next); return; }
+    if(act.end==="evaluate"){ evaluateFinal(); return; }
+    if(act.end){ finish(act.end,"warning"); }
+}
+
+function evaluateFinal(){
+    let msg="", style="";
+    if(risk>=14){ msg="Riesgo muy alto: replantea salida."; style="warning"; }
+    else if(risk>=9){ msg="Riesgo alto: itinerario conservador."; style="warning"; }
+    else if(risk>=5){ msg="Riesgo moderado: precaución."; style="medium"; }
+    else{ msg="Condiciones relativamente favorables."; style="safe"; }
+    finish(msg,style);
+}
+
+function finish(msg,style){
+    document.getElementById("question").textContent = "Resultado:";
+    document.getElementById("info").textContent = "";
+    document.getElementById("buttons").innerHTML = "";
+    const r = document.getElementById("result");
+    r.className = "result "+style;
+    r.textContent = msg;
+    let sum="<strong>Resumen:</strong><br><br>Riesgo acumulado: "+risk+"<br><br>";
+    answers.forEach(a=>{sum+="• "+a.question+" → "+a.response+"<br>";});
+    document.getElementById("summary").innerHTML = sum;
+}
+
+// Inicia el checklist
+showStep(step);
+
+</script>
+
+</body>
+</html>
