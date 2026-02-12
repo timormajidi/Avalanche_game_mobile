@@ -41,7 +41,7 @@ const steps = [
 {q:"¿Coincide orientación del itinerario con orientación crítica del BPA?", info:"Si coincide, el riesgo aumenta.", yes:{next:4, risk:2}, no:{next:4, risk:0}},
 {q:"¿La altitud máxima del itinerario entra en franja crítica del BPA?", info:"Altitud y hora de paso son importantes.", yes:{next:5, risk:2}, no:{next:5, risk:0}},
 {q:"¿Existen convexidades, canales, barrancos u otros terrenos trampa?", info:"Aumentan consecuencia de un alud.", yes:{next:6, risk:3}, no:{next:6, risk:0}},
-{q:"¿Ha caído nieve nueva en últimas 12h o se prevé durante la salida?", info:"Nieve reciente aumenta sobrecarga sobre capas débiles.", yes:{next:7, risk:2}, no:{next:7, risk:0}},
+{q:"¿Ha caído nieve nueva en últimas 12h o se prevé durante la salida?", info:"La nieve reciente no se une bien con la capa anterior y puede deslizarse fácilmente, incluso sobre una base estable.", yes:{next:7, risk:2}, no:{next:7, risk:0}},
 {q:"¿Hay viento fuerte que pueda transportar nieve?", info:"El viento genera placas en sotavento.", yes:{next:8, risk:2}, no:{next:8, risk:0}},
 {q:"¿La visibilidad permite evaluar correctamente el terreno?", info:"Mala visibilidad dificulta detección de señales de riesgo.", yes:{next:9, risk:0}, no:{next:9, risk:1}},
 {q:"¿Tienes Plan B o escapatorias para reducir exposición?", info:"Alternativas seguras reducen riesgo durante la salida.", yes:{end:"evaluate"}, no:{end:"Define Plan B antes de salir."}}
